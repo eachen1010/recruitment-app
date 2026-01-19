@@ -6,7 +6,7 @@ export default async function Page() {
         <body>
           <div>
             <ul>
-              login
+              home or login
             </ul>
           </div>
         </body>

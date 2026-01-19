@@ -2,7 +2,7 @@ import { columns, Candidate } from "./columns"
 import { DataTable } from "./data-table"
 
 const AIRTABLE_URL =
-  "https://api.airtable.com/v0/appprUL7tR0m0OptO/General%20Member%20Application?maxRecords=3&view=Grid%20View";
+  "https://api.airtable.com/v0/appprUL7tR0m0OptO/General%20Member%20Application?maxRecords=50&view=Grid%20View";
 
 type AirtableFields = {
   Name?: string;
@@ -43,7 +43,7 @@ export async function getCandidateData(): Promise<Candidate[]> {
         id: item.id,
         name: item.fields.Name,
         lastname: item.fields["Last Name"],
-        status: item.fields.Priority,
+        priority: item.fields.Priority,
         email: item.fields.Email
       }));
 }
@@ -55,9 +55,11 @@ export default async function Page() {
 
   return (
     <>
-      <ul>Welcome back User!</ul>
-      <div className="container mx-auto py-10">
-        <DataTable columns={columns} data={data} />
+      <div className="flex flex-col gap-4 justify-center">
+        <ul>Welcome back User!</ul>
+        <div className="mx-auto py-10 justify-center">
+          <DataTable columns={columns} data={data} />
+        </div>
       </div>
     </>
   )

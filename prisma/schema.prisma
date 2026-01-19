@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model EmailTemplateDummy {
+  id        Int       @id @default(autoincrement())
+  content   String?
+  author    String?
+  createdAt DateTime? @db.Timestamptz(6)
+  title     String    @unique
+}
