@@ -63,11 +63,7 @@ export default function EditEmail({ email }: { email: any }) {
         />
       </Field>
       <div className="flex gap-2 mt-4">
-        <Button 
-        type="submit"
-        onClick={() =>
-          toast("Saved!")
-        }>Save</Button>
+        <Button type="submit">Save</Button>
         <Link href={`?edit=false`}>
             <Button variant="ghost">
             Cancel

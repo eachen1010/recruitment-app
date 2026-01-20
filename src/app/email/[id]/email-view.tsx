@@ -24,9 +24,7 @@ export default function ViewEmail({ email }: { email: any }) {
         <Button variant="ghost" id={String(email?.id)}><PencilLine/></Button>
         </Link>
         </div>
-        <Textarea className="disabled">
-            {email?.content}
-        </Textarea>
+        <Textarea value={email?.content} readOnly/>
         <ItemFooter className="mt-3">Author: {email?.author}, Last Edited: {String(email?.createdAt)}</ItemFooter>
         </ItemContent>
     </Item>
