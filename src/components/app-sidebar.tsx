@@ -29,8 +29,8 @@ const items = [
     icon: Calendar,
   },
   {
-    title: "",
-    url: "#",
+    title: "Candidates",
+    url: "/candidates",
     icon: Search,
   },
   {

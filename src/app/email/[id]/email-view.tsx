@@ -10,6 +10,7 @@ import {
     ItemFooter,
     ItemTitle,
   } from "@/components/ui/item"
+import { Textarea } from "@/components/ui/textarea"
 import { PencilLine } from "lucide-react"
 import Link from "next/link";
 
@@ -23,9 +24,9 @@ export default function ViewEmail({ email }: { email: any }) {
         <Button variant="ghost" id={String(email?.id)}><PencilLine/></Button>
         </Link>
         </div>
-        <ItemDescription>
+        <Textarea className="disabled">
             {email?.content}
-        </ItemDescription>
+        </Textarea>
         <ItemFooter className="mt-3">Author: {email?.author}, Last Edited: {String(email?.createdAt)}</ItemFooter>
         </ItemContent>
     </Item>

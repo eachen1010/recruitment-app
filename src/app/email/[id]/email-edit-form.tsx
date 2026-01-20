@@ -4,6 +4,7 @@ import { useState } from "react"
 import { updateTemplate } from "../actions";
 import { Button } from "@/components/ui/button";
 import { PencilLine } from "lucide-react"
+import { toast } from "sonner"
 import {
     Item,
     ItemActions,
@@ -13,6 +14,7 @@ import {
     ItemFooter,
     ItemTitle,
   } from "@/components/ui/item"
+import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input";
 import {
   Field,
@@ -53,7 +55,7 @@ export default function EditEmail({ email }: { email: any }) {
         <FieldLabel htmlFor="template-contents">
           Contents
         </FieldLabel>
-        <Input
+        <Textarea
           id="template-contents"
           placeholder={email?.content}
           defaultValue={email?.content}
@@ -61,7 +63,11 @@ export default function EditEmail({ email }: { email: any }) {
         />
       </Field>
       <div className="flex gap-2 mt-4">
-        <Button type="submit">Save</Button>
+        <Button 
+        type="submit"
+        onClick={() =>
+          toast("Saved!")
+        }>Save</Button>
         <Link href={`?edit=false`}>
             <Button variant="ghost">
             Cancel
