@@ -27,6 +27,10 @@ import {
 } from "@/components/ui/field"
 import Link from "next/link";
 
+/*
+[] need to change to a rich editor instead so that images and signatures can be written
+*/
+
 export default function EditEmail({ email }: { email: any }) {
   const [title, setTitle] = useState(email.title);
   const [contents, setContents] = useState(email.content);
