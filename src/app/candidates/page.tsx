@@ -1,65 +1,43 @@
-import { columns, Candidate } from "./columns"
-import { DataTable } from "./data-table"
+import { AirtableRecord } from "./columns"
+import { CandidatesTable } from "./candidates-table"
 import { Label } from "@/components/ui/label"
+import { getCandidateData } from "@/lib/airtable";
 
-const AIRTABLE_URL =
-  "https://api.airtable.com/v0/appprUL7tR0m0OptO/General%20Member%20Application?maxRecords=50&view=Grid%20View";
-
-type AirtableFields = {
-  Name?: string;
-  "Last Name"?: string;
-  Priority?: string;
-  Email?: string;
-};  
-
-type AirtableRecord = {
-  id: string;
-  fields: AirtableFields;
-};
-
-type AirtableResponse = {
-  records: AirtableRecord[];
-}
-
-export async function getCandidateData(): Promise<Candidate[]> {
-  const res = await fetch(AIRTABLE_URL, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`,
-    },
-    cache: "no-store",
+async function formatCandidateData(): Promise<AirtableRecord[]> {
+  const data = await getCandidateData();
+  // The data from getCandidateData already has the structure { id, ...fields }
+  // We need to restructure it to { id, fields: { ... } }
+  const formatted = data.map((item) => {
+    const { id, ...fields } = item;
+    return {
+      id,
+      fields: fields as Record<string, any>
+    };
   });
 
-  if (!res.ok) {
-    throw new Error(`Airtable fetch failed: ${res.status}`);
-  }
-
-  // parse the data
-  const data = (await res.json()) as AirtableResponse;
-  console.log(data);
-
-  return data["records"].map(
-    (item) => (
-      {
-        id: item.id,
-        name: item.fields.Name,
-        lastname: item.fields["Last Name"],
-        priority: item.fields.Priority,
-        email: item.fields.Email
-      }));
+  // Filter out rows that are completely empty (all fields are null, undefined, empty string, or empty array)
+  return formatted.filter((record) => {
+    const fieldValues = Object.values(record.fields || {});
+    // Check if any field has a non-empty value
+    return fieldValues.some((value) => {
+      if (value === null || value === undefined) return false;
+      if (typeof value === 'string' && value.trim() === '') return false;
+      if (Array.isArray(value) && value.length === 0) return false;
+      if (typeof value === 'object' && Object.keys(value).length === 0) return false;
+      return true; // Field has a meaningful value
+    });
+  });
 }
 
-
 export default async function Page() {
-  const data = await getCandidateData();
-  console.log(data);
+  const candidates = await formatCandidateData();
 
   return (
     <>
-      <div className="flex flex-col gap-4 justify-center">
+      <div className="flex flex-col gap-4 h-full w-full overflow-x-hidden">
         <Label className="mt-4 ml-4 text-2xl">Candidate Dashboard</Label>
-        <div className="mx-auto py-10 justify-center">
-          <DataTable columns={columns} data={data} />
+        <div className="flex-1 w-full px-4 min-w-0">
+          <CandidatesTable candidates={candidates} />
         </div>
       </div>
     </>

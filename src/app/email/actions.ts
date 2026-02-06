@@ -1,7 +1,8 @@
 "use server";
 
-import { prisma } from "@/lib/db";
-import { redirect } from "next/navigation";
+import { prisma } from "@/lib/db"
+import { redirect } from "next/navigation"
+import { toast } from "sonner"
 
 export async function updateTemplate(id: number, title: String, content: String) {
   await prisma.emailTemplateDummy.update({
