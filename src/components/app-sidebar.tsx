@@ -3,6 +3,7 @@ import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -10,6 +11,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { AccountCenter } from "@/components/account-center"
 
 // Menu items.
 const items = [
@@ -25,18 +27,13 @@ const items = [
   },
   {
     title: "Scheduling",
-    url: "#",
+    url: "/scheduling",
     icon: Calendar,
   },
   {
     title: "Candidates",
     url: "/candidates",
     icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
   },
 ]
 
@@ -62,6 +59,9 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <AccountCenter />
+      </SidebarFooter>
     </Sidebar>
   )
 }
