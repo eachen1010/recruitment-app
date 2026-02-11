@@ -1,18 +1,20 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
+import { ConditionalLayout } from "@/components/conditional-layout"
+import { Toaster } from "@/components/ui/sonner"
+import { AuthProvider } from "@/contexts/auth-context"
+import { FirebaseConfigCheck } from "@/components/firebase-config-check"
 import "./globals.css"
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html>
         <body>
-            <SidebarProvider>
-            <AppSidebar />
-            <main className="w-full p-[1vw] overflow-x-hidden min-w-0">
-                <SidebarTrigger />
+            <AuthProvider>
+              <ConditionalLayout>
                 {children}
-            </main>
-            </SidebarProvider>
+              </ConditionalLayout>
+            </AuthProvider>
+            <Toaster />
+            <FirebaseConfigCheck />
         </body>
     </html>
   )

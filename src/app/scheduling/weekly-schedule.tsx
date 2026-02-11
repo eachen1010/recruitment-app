@@ -4,6 +4,9 @@ import * as React from "react"
 import { ChevronLeft, ChevronRight, Save } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
+import { useAuth } from "@/contexts/auth-context"
+import { upsertAvailability } from "./actions"
 
 const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 const HOURS = Array.from({ length: 24 }, (_, i) => i)
@@ -19,6 +22,8 @@ export function WeeklySchedule() {
   const [currentWeek, setCurrentWeek] = React.useState(new Date())
   // Store available slots as a Set of slot IDs
   const [availableSlots, setAvailableSlots] = React.useState<Set<string>>(new Set())
+  const { user } = useAuth()
+  const [isSaving, setIsSaving] = React.useState(false)
   // Drag state
   const [isDragging, setIsDragging] = React.useState(false)
   const [dragStartState, setDragStartState] = React.useState<boolean | null>(null)
@@ -216,27 +221,57 @@ export function WeeklySchedule() {
     }
   }, [isDragging])
 
-  const handleSave = () => {
-    // Convert Set to Array and organize by day for better readability
-    const slotsArray = Array.from(availableSlots).sort()
-    const organizedByDay: Record<string, string[]> = {}
-    
-    slotsArray.forEach(slotId => {
-      const [day, time] = slotId.split('-')
-      if (!organizedByDay[day]) {
-        organizedByDay[day] = []
-      }
-      organizedByDay[day].push(time)
-    })
-
-    const availabilityData = {
-      totalSlots: availableSlots.size,
-      slots: slotsArray,
-      organizedByDay: organizedByDay,
-      rawSet: Array.from(availableSlots)
+  const handleSave = async () => {
+    if (!user) {
+      toast.error("You must be logged in to save availability")
+      return
     }
 
-    console.log('📅 Availability Data (Saved):', JSON.stringify(availabilityData, null, 2))
+    setIsSaving(true)
+
+    try {
+      // Convert Set to Array and organize by day for better readability
+      const slotsArray = Array.from(availableSlots).sort()
+      const organizedByDay: Record<string, string[]> = {}
+      
+      slotsArray.forEach(slotId => {
+        const [day, time] = slotId.split('-')
+        if (!organizedByDay[day]) {
+          organizedByDay[day] = []
+        }
+        organizedByDay[day].push(time)
+      })
+
+      const availabilityData = {
+        totalSlots: availableSlots.size,
+        slots: slotsArray,
+        organizedByDay: organizedByDay,
+        rawSet: Array.from(availableSlots)
+      }
+
+      // Convert to JSON string for storage
+      const availabilityJson = JSON.stringify(availabilityData)
+
+      // Get user info
+      const email = user.email || ""
+      const name = user.displayName || user.email?.split("@")[0] || "User"
+      const role = undefined // You can add role selection later if needed
+
+      // Save to database
+      await upsertAvailability(email, name, availabilityJson, role)
+
+      console.log('Availability Data (Saved):', JSON.stringify(availabilityData, null, 2))
+      
+      // Show success toast
+      toast.success("Availability saved successfully!", {
+        description: `${availableSlots.size} time slot${availableSlots.size !== 1 ? 's' : ''} marked as available.`,
+      })
+    } catch (error) {
+      console.error("Error saving availability:", error)
+      toast.error("Failed to save availability. Please try again.")
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const isSlotAvailable = (day: string, hour: number, quarter: number) => {
@@ -277,9 +312,9 @@ export function WeeklySchedule() {
           </Button>
           <span className="ml-4 font-medium">{getTimeRange(weekStart)}</span>
         </div>
-        <Button onClick={handleSave} className="gap-2">
+        <Button onClick={handleSave} className="gap-2" disabled={isSaving || !user}>
           <Save className="h-4 w-4" />
-          Save
+          {isSaving ? "Saving..." : "Save"}
         </Button>
       </div>
 

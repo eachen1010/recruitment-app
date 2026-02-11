@@ -3,37 +3,23 @@
 import { useState } from "react"
 import { updateTemplate } from "../actions";
 import { Button } from "@/components/ui/button";
-import { PencilLine } from "lucide-react"
 import { toast } from "sonner"
 import {
     Item,
-    ItemActions,
     ItemContent,
-    ItemDescription,
-    ItemMedia,
     ItemFooter,
-    ItemTitle,
   } from "@/components/ui/item"
-import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input";
 import {
   Field,
-  FieldDescription,
-  FieldGroup,
   FieldLabel,
-  FieldLegend,
-  FieldSeparator,
-  FieldSet,
 } from "@/components/ui/field"
 import Link from "next/link";
-
-/*
-[] need to change to a rich editor instead so that images and signatures can be written
-*/
+import { RichTextEditor } from "@/components/rich-text-editor";
 
 export default function EditEmail({ email }: { email: any }) {
-  const [title, setTitle] = useState(email.title);
-  const [contents, setContents] = useState(email.content);
+  const [title, setTitle] = useState(email?.title || "");
+  const [contents, setContents] = useState(email?.content || "");
 
   return (
     <Item variant="outline" className="flex my-4">
@@ -59,11 +45,10 @@ export default function EditEmail({ email }: { email: any }) {
         <FieldLabel htmlFor="template-contents">
           Contents
         </FieldLabel>
-        <Textarea
-          id="template-contents"
-          placeholder={email?.content}
-          defaultValue={email?.content}
-          onChange={(e) => setContents(e.target.value)}
+        <RichTextEditor
+          content={contents}
+          onChange={setContents}
+          placeholder="Start writing your email template..."
         />
       </Field>
       <div className="flex gap-2 mt-4">
