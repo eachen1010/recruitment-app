@@ -119,6 +119,9 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html, body {
+    @apply h-full;
+  }
   body {
     @apply bg-background text-foreground;
   }
@@ -190,6 +193,21 @@
 
 .ProseMirror s {
   text-decoration: line-through;
+}
+
+.ProseMirror [data-badge] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  user-select: none;
 }
 
 @layer base {

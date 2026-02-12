@@ -2,6 +2,7 @@ import { prisma } from '@/lib/db'
 import ViewEmail from './email-view'
 import EditEmail from './email-edit-form'
 import RecipientSelectSheet from './recipient-select-sheet'
+import { DismissLoadingToast } from './dismiss-loading-toast'
 
 /* TODO: 
 [x] fetch email template based on id
@@ -72,6 +73,7 @@ export default async function EmailTemplatePage({
   
   return (
     <div>
+      <DismissLoadingToast />
       {isEdit ? (
         <div className="h-full w-full justify-end gap-4">
           <EditEmail email={template}></EditEmail>
@@ -79,10 +81,9 @@ export default async function EmailTemplatePage({
       ) : (
         <div className="h-full w-full justify-end gap-4">
           <ViewEmail email={template}></ViewEmail>
+          <RecipientSelectSheet peopledata={data}/>
         </div>
       )}
-
-      <RecipientSelectSheet peopledata={data}/>
     </div>
   
   )

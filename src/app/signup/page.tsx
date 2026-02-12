@@ -11,7 +11,6 @@ import Link from "next/link"
 import { auth } from "@/lib/firebase/client"
 import { toast } from "sonner"
 import { Separator } from "@/components/ui/separator"
-
 export default function SignUpPage() {
   const [name, setName] = React.useState("")
   const [email, setEmail] = React.useState("")
@@ -59,7 +58,8 @@ export default function SignUpPage() {
       }
       
       toast.success("Account created successfully!")
-      router.push("/dashboard")
+      // Redirect to role survey page
+      router.push("/role-survey")
     } catch (error: any) {
       console.error("Signup error:", error)
       console.error("Error code:", error.code)
@@ -102,8 +102,31 @@ export default function SignUpPage() {
 
     try {
       const result = await signInWithPopup(auth, googleProvider)
-      toast.success("Account created successfully with Google!")
-      router.push("/dashboard")
+      
+      // Check if this is a new account (first signup)
+      const metadata = result.user.metadata
+      const creationTime = metadata.creationTime ? new Date(metadata.creationTime).getTime() : 0
+      const lastSignInTime = metadata.lastSignInTime ? new Date(metadata.lastSignInTime).getTime() : 0
+      const isNewAccount = creationTime === lastSignInTime && creationTime > 0
+      
+      // Update user profile with display name if available
+      if (result.user.displayName) {
+        await updateProfile(result.user, {
+          displayName: result.user.displayName,
+        })
+      }
+      
+      // Check if they've completed the survey
+      const surveyCompleted = localStorage.getItem(`roleSurveyCompleted_${result.user.uid}`)
+      
+      if (isNewAccount || !surveyCompleted) {
+        // First time signup or survey not completed - redirect to survey
+        toast.success("Account created successfully with Google!")
+        router.push("/role-survey")
+      } else {
+        toast.success("Successfully signed in with Google!")
+        router.push("/dashboard")
+      }
     } catch (error: any) {
       console.error("Google sign-in error:", error)
       
@@ -148,7 +171,7 @@ export default function SignUpPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              disabled={isLoading}
+              disabled={isLoading || isGoogleLoading}
             />
           </div>
 
@@ -161,7 +184,7 @@ export default function SignUpPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              disabled={isLoading}
+              disabled={isLoading || isGoogleLoading}
             />
           </div>
 
@@ -191,7 +214,7 @@ export default function SignUpPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              disabled={isLoading}
+              disabled={isLoading || isGoogleLoading}
             />
           </div>
 

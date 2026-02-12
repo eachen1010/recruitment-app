@@ -24,6 +24,8 @@ import {
   AlignRight,
   Smile,
   Paperclip,
+  Sparkles,
+  ChevronDown,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
@@ -36,6 +38,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Badge } from "@/components/ui/badge"
 
 interface RichTextEditorProps {
   content: string
@@ -197,6 +206,16 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
     }
   }
 
+  const insertBadge = (badgeType: "name" | "role" | "interviewer") => {
+    if (editor) {
+      // Insert formatted HTML with curly braces - TipTap will parse and preserve the formatting
+      // Using nested tags: strong for bold, em for italic, span with color style
+      const formattedHTML = `<strong><em><span style="color: #3b82f6;">{${badgeType}}</span></em></strong>`
+      
+      editor.chain().focus().insertContent(formattedHTML).run()
+    }
+  }
+
   const emojis = ["😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚", "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🤩", "🥳", "😏", "😒", "😞", "😔", "😟", "😕", "🙁", "☹️", "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡", "🤬", "🤯", "😳", "🥵", "🥶", "😱", "😨", "😰", "😥", "😓", "🤗", "🤔", "🤭", "🤫", "🤥", "😶", "😐", "😑", "😬", "🙄", "😯", "😦", "😧", "😮", "😲", "🥱", "😴", "🤤", "😪", "😵", "🤐", "🥴", "🤢", "🤮", "🤧", "😷", "🤒", "🤕", "🤑", "🤠", "😈", "👿", "👹", "👺", "🤡", "💩", "👻", "💀", "☠️", "👽", "👾", "🤖", "🎃", "😺", "😸", "😹", "😻", "😼", "😽", "🙀", "😿", "😾"]
 
   return (
@@ -314,6 +333,34 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
         >
           <ImageIcon className="h-4 w-4" />
         </Button>
+        <div className="w-px h-6 bg-border mx-1" />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+            >
+              <Sparkles className="h-4 w-4" />
+              <span className="hidden sm:inline ml-1">Customize</span>
+              <ChevronDown className="h-3 w-3 ml-1" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem onClick={() => insertBadge("name")}>
+              <Badge variant="default" className="mr-2">name</Badge>
+              Insert Name Badge
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => insertBadge("role")}>
+              <Badge variant="default" className="mr-2">role</Badge>
+              Insert Role Badge
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => insertBadge("interviewer")}>
+              <Badge variant="default" className="mr-2">interviewer</Badge>
+              Insert Interviewer Badge
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <div className="w-px h-6 bg-border mx-1" />
         <div className="relative emoji-picker-container">
           <Button

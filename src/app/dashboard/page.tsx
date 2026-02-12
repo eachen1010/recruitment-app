@@ -1,12 +1,9 @@
+import { WelcomeSection } from "./welcome-section"
 
 export default async function Page() {
-    let data = await fetch('https://api.vercel.app/blog')
-    let posts = await data.json()
     return (
-      <div>
-        <ul>
-          home
-        </ul>
+      <div className="w-full p-6 pt-6">
+        <WelcomeSection />
       </div>
     )
   }

@@ -34,9 +34,19 @@ export default function LoginPage() {
     }
     
     try {
-      await signInWithEmailAndPassword(auth, email, password)
-      toast.success("Successfully signed in!")
-      router.push("/dashboard")
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      
+      // Check if they've completed the survey
+      const surveyCompleted = localStorage.getItem(`roleSurveyCompleted_${userCredential.user.uid}`)
+      
+      if (!surveyCompleted) {
+        // Survey not completed - redirect to survey page
+        toast.success("Successfully signed in!")
+        router.push("/role-survey")
+      } else {
+        toast.success("Successfully signed in!")
+        router.push("/dashboard")
+      }
     } catch (error: any) {
       console.error("Login error:", error)
       console.error("Error code:", error.code)
@@ -80,9 +90,26 @@ export default function LoginPage() {
     setIsGoogleLoading(true)
 
     try {
+      // Sign in with Google
       const result = await signInWithPopup(auth, googleProvider)
-      toast.success("Successfully signed in with Google!")
-      router.push("/dashboard")
+      
+      // Check if this is a new account (first sign-in)
+      const metadata = result.user.metadata
+      const creationTime = metadata.creationTime ? new Date(metadata.creationTime).getTime() : 0
+      const lastSignInTime = metadata.lastSignInTime ? new Date(metadata.lastSignInTime).getTime() : 0
+      const isNewAccount = creationTime === lastSignInTime && creationTime > 0
+      
+      // Check if they've completed the survey
+      const surveyCompleted = localStorage.getItem(`roleSurveyCompleted_${result.user.uid}`)
+      
+      if (isNewAccount || !surveyCompleted) {
+        // First time sign-in or survey not completed - redirect to survey page
+        toast.success("Successfully signed in!")
+        router.push("/role-survey")
+      } else {
+        toast.success("Successfully signed in with Google!")
+        router.push("/dashboard")
+      }
     } catch (error: any) {
       console.error("Google sign-in error:", error)
       
@@ -99,7 +126,6 @@ export default function LoginPage() {
       }
       
       toast.error(errorMessage)
-    } finally {
       setIsGoogleLoading(false)
     }
   }
@@ -127,7 +153,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              disabled={isLoading}
+              disabled={isLoading || isGoogleLoading}
             />
           </div>
 
@@ -152,7 +178,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              disabled={isLoading}
+              disabled={isLoading || isGoogleLoading}
             />
           </div>
 
